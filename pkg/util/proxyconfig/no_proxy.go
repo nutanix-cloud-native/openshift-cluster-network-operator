@@ -105,6 +105,17 @@ func MergeUserSystemNoProxy(proxy *configv1.Proxy, infra *configv1.Infrastructur
 		}
 	}
 
+	if infra.Spec.PlatformSpec.Type == configv1.NutanixPlatformType && infra.Spec.PlatformSpec.Nutanix != nil {
+		// Add user's Prism Central endpoint to the set
+		prismCentral := infra.Spec.PlatformSpec.Nutanix.PrismCentral.Address
+		set.Insert(prismCentral)
+
+		// Add user's Prism Element endpoints to the set
+		for _, prismElement := range infra.Spec.PlatformSpec.Nutanix.PrismElements {
+			set.Insert(prismElement.Endpoint.Address)
+		}
+	}
+
 	if len(network.Status.ClusterNetwork) > 0 {
 		for _, clusterNetwork := range network.Status.ClusterNetwork {
 			set.Insert(clusterNetwork.CIDR)
